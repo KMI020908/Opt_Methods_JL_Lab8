@@ -31,7 +31,8 @@ function classicNewtonMethod(f, startPoint::Vector{<:Number}, ϵ::Number = 1e-6,
     return point, f(point), numOfAntiGrad, numOfFunctions, X, Y, norm(antiGradFunc(point));
 end;
 
-function insideBarierMethod(f::Function, h::Function, r::Number, γ::Number, startPoint::Vector{<:Number}, ϵ::Float64 = 1e-6)
+function insideBarierMethod(f::Function, h::Function, r::Number, γ::Number, startPoint::Vector{<:Number}, ϵ::Float64 = 1e-6, 
+allPointsMode::Bool = false)
     numOfIterations::Int = 1; # Количество итераций
     numOfFunctions::Int = 0;
     X = Number[startPoint[1]] # Координаты x 
@@ -40,11 +41,16 @@ function insideBarierMethod(f::Function, h::Function, r::Number, γ::Number, sta
     prev_point = startPoint
     data = classicNewtonMethod(f_k, prev_point, ϵ)
     numOfFunctions += data[4]
-    for i in 1 : length(data[5]) 
-        push!(X, data[5][i])
-    end
-    for i in 1 : length(data[6]) 
-        push!(Y, data[6][i])
+    if allPointsMode == true
+        for i in 1 : length(data[5]) 
+            push!(X, data[5][i])
+        end
+        for i in 1 : length(data[6]) 
+            push!(Y, data[6][i])
+        end
+    else
+        push!(X, data[1][1])
+        push!(Y, data[1][2])
     end
     point = data[1]
     prev_f = f(prev_point)
@@ -55,11 +61,16 @@ function insideBarierMethod(f::Function, h::Function, r::Number, γ::Number, sta
         prev_f = data[2]
         data = classicNewtonMethod(f_k_cycle, prev_point, ϵ)
         numOfFunctions += data[4]
-        for i in 1 : length(data[5]) 
-            push!(X, data[5][i])
-        end
-        for i in 1 : length(data[6]) 
-            push!(Y, data[6][i])
+        if allPointsMode == true
+            for i in 1 : length(data[5]) 
+                push!(X, data[5][i])
+            end
+            for i in 1 : length(data[6]) 
+                push!(Y, data[6][i])
+            end
+        else
+            push!(X, data[1][1])
+            push!(Y, data[1][2])
         end
         point = data[1]
         r /= γ
@@ -68,20 +79,26 @@ function insideBarierMethod(f::Function, h::Function, r::Number, γ::Number, sta
     return point, f(point), numOfFunctions, numOfIterations, X, Y
 end;
 
-function outsideBarierMethod(f::Function, h::Function, r::Number, γ::Number, startPoint::Vector{<:Number}, ϵ::Float64 = 1e-6)
+function outsideBarierMethod(f::Function, h::Function, r::Number, γ::Number, startPoint::Vector{<:Number}, ϵ::Float64 = 1e-6,
+allPointsMode::Bool = false)
     numOfIterations::Int = 1; # Количество итераций
     numOfFunctions::Int = 0;
     X = Number[startPoint[1]] # Координаты x 
     Y = Number[startPoint[2]] # Координаты y
-    f_k(x) = f(x) - r * h(x)
+    f_k(x) = f(x) + r * h(x)
     prev_point = startPoint
     data = classicNewtonMethod(f_k, prev_point, ϵ)
     numOfFunctions += data[4]
-    for i in 1 : length(data[5]) 
-        push!(X, data[5][i])
-    end
-    for i in 1 : length(data[6]) 
-        push!(Y, data[6][i])
+    if allPointsMode == true
+        for i in 1 : length(data[5]) 
+            push!(X, data[5][i])
+        end
+        for i in 1 : length(data[6]) 
+            push!(Y, data[6][i])
+        end
+    else
+        push!(X, data[1][1])
+        push!(Y, data[1][2])
     end
     point = data[1]
     prev_f = f(prev_point)
@@ -92,18 +109,23 @@ function outsideBarierMethod(f::Function, h::Function, r::Number, γ::Number, st
         prev_f = data[2]
         data = classicNewtonMethod(f_k_cycle, prev_point, ϵ)
         numOfFunctions += data[4]
-        for i in 1 : length(data[5]) 
-            push!(X, data[5][i])
-        end
-        for i in 1 : length(data[6]) 
-            push!(Y, data[6][i])
+        if allPointsMode == true
+            for i in 1 : length(data[5]) 
+                push!(X, data[5][i])
+            end
+            for i in 1 : length(data[6]) 
+                push!(Y, data[6][i])
+            end
+        else
+            push!(X, data[1][1])
+            push!(Y, data[1][2])
         end
         point = data[1]
         r += γ
         numOfIterations += 1
     end
     return point, f(point), numOfFunctions, numOfIterations, X, Y
-end;
+end
 
 
 
