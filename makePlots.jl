@@ -56,6 +56,8 @@ function makeGradPlot(f, low, up, X, Y, title = "", ϵ = 1e-6 , addBounds = 0, n
             size=16
         )
     );
+    #x = range(-0.5, stop = 3, length = 100);
+    #y = range(0, stop = 4, length = 100);
     x = range(-30, stop = 30, length = 100);
     y = range(-30, stop = 30, length = 100);
     z = [f([x[i], y[j]])
@@ -132,8 +134,8 @@ function makeGradPlot(f, low, up, X, Y, title = "", ϵ = 1e-6 , addBounds = 0, n
     if addBounds == 2
         t = range(0, stop = 2 * π, length = 100)
         boundPl = Plotly.scatter( 
-            x = 2 * √10 * cos.(t) .+ 3,
-            y = 3 * √10 * sin.(t) .+ 4,
+            x = 2 * √10 * cos.(t) .- 3,
+            y = 3 * √10 * sin.(t) .- 4,
             line = attr(
                 width = 4,
                 color = "red",
@@ -146,7 +148,7 @@ function makeGradPlot(f, low, up, X, Y, title = "", ϵ = 1e-6 , addBounds = 0, n
     return Plotly.Plot([cntr, lineSctr, sctr, firstPoint, lastPoint], layout)
 end;
 
-function makeGradPlotCustom(f, low, up, X, Y, title = "", ϵ = 1e-6 , wd = 800, hg = 600)
+function makeGradPlotCustom(f, low, up, X, Y, title = "", ϵ = 1e-6 , addBounds = 0, wd = 800, hg = 600)
     layout = Layout(
         paper_bg = "white",
         width = wd, height = hg,
@@ -181,7 +183,7 @@ function makeGradPlotCustom(f, low, up, X, Y, title = "", ϵ = 1e-6 , wd = 800, 
         autocontour = false,
         autoz = false,
         zmax = f([X[1], Y[1]]),
-        zmin = f([X[length(X) - 3], Y[length(Y) - 3]]),
+        zmin = f([X[length(X)] - 3, Y[length(Y)] - 3]),
         ncontours = 100
     )
     lineSctr = Plotly.scatter(
@@ -207,5 +209,54 @@ function makeGradPlotCustom(f, low, up, X, Y, title = "", ϵ = 1e-6 , wd = 800, 
         marker = attr(symbol = "x", color = "yellow", size = 12),
         showlegend = false
     )
-    Plotly.Plot([cntr, lineSctr, sctr, firstPoint, lastPoint], layout)
+    if addBounds == 1
+        clr = "red"
+        boundPl1 = Plotly.scatter(
+            x = [0 for i in 0 : 0.1 : 10],
+            y = [i for i in 0 : 0.1 : 10],
+            line = attr(
+                width = 4,
+                color = clr,
+                dash = "dash"
+            ),
+            showlegend = false
+        )
+        boundPl2 = Plotly.scatter(
+            x = [i for i in 0 : 0.1 : 10],
+            y = [0 for i in 0 : 0.1 : 10],
+            line = attr(
+                width = 4,
+                color = clr,
+                dash = "dash"
+            ),
+            showlegend = false
+        )
+        xInt = [i for i in 0 : 0.1 : 10]
+        boundPl3 = Plotly.scatter(
+            x = xInt,
+            y = -xInt .+ 10,
+            line = attr(
+                width = 4,
+                color = clr,
+                dash = "dash"
+            ),
+            showlegend = false
+        )
+        return Plotly.Plot([cntr, lineSctr, sctr, firstPoint, lastPoint, boundPl1, boundPl2, boundPl3], layout)   
+    end
+    if addBounds == 2
+        t = range(0, stop = 2 * π, length = 100)
+        boundPl = Plotly.scatter( 
+            x = 2 * √10 * cos.(t) .- 3,
+            y = 3 * √10 * sin.(t) .- 4,
+            line = attr(
+                width = 4,
+                color = "red",
+                dash = "dash"
+            ),
+            showlegend = false
+        )
+        return Plotly.Plot([cntr, lineSctr, sctr, firstPoint, lastPoint, boundPl], layout)
+    end
+    return Plotly.Plot([cntr, lineSctr, sctr, firstPoint, lastPoint], layout)
 end;

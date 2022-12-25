@@ -14,10 +14,12 @@ function classicNewtonMethod(f, startPoint::Vector{<:Number}, ϵ::Number = 1e-6,
     point = startPoint
     while norm(antiGradFunc(point)) ≥ ϵ
         hessian = hesseMatrix(point)
+        #=
         while hessian[1, 1] <= 0 || det(hessian) <= 0 
             hessian[1, 1] += η
             hessian[2, 2] += η
         end
+        =#
         numOfFunctions += 12 # Добавление числа вычислений функции
         numOfAntiGrad += 1 # Прибавление антиградиента
         numOfFunctions += 3 # Добавление числа вычислений функции
@@ -104,6 +106,7 @@ allPointsMode::Bool = false)
     prev_f = f(prev_point)
     r += γ
     while abs(prev_f - data[2]) ≥ ϵ
+    #while norm(point - prev_point) ≥ ϵ
         f_k_cycle(x) = f(x) + r * h(x)
         prev_point = point
         prev_f = data[2]
@@ -121,7 +124,7 @@ allPointsMode::Bool = false)
             push!(Y, data[1][2])
         end
         point = data[1]
-        r += γ
+        r *= γ
         numOfIterations += 1
     end
     return point, f(point), numOfFunctions, numOfIterations, X, Y
